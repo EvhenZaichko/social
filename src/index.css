@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme static {
+    /* кастомная чёрная палитра (в духе X/Twitter) */
+    --color-night-950: #000000;  /* фон страницы */
+    --color-night-900: #0f1114;  /* карточки, поверхности */
+    --color-night-850: #16181c;  /* ховер, вложенные блоки */
+    --color-night-800: #202327;  /* инпуты, поля */
+    --color-night-700: #2f3336;  /* бордеры, разделители */
+    --color-night-500: #71767b;  /* приглушённый текст */
+}
+
+html {
+    background-color: var(--color-night-900);
+    color-scheme: dark;
+}
