@@ -1,5 +1,6 @@
 import {create} from 'zustand'
 import axios from "axios";
+import toast from 'react-hot-toast'
 
 const API = 'http://localhost:5000/postRouter'
 
@@ -114,6 +115,19 @@ export const usePostStore = create((set, get) => ({
         } catch (e) {
             console.log('getProfileFeed error', e)
             throw e
+        }
+    },
+
+    deletePost: async (postId) => {
+        try {
+            await axios.delete(`${API}/deletePost/${postId}`, authHeader())
+            set({posts: get().posts.filter(post => post._id !== postId)})
+            toast.success('Post Deleted!')
+            return true
+        } catch (e) {
+            console.log('deletePost error', e)
+            toast.error(e.response?.data?.message ?? 'Failed to delete post')
+            return false
         }
     }
 

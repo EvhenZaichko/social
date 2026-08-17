@@ -13,7 +13,7 @@ export function formatPostDate(input) {
     if (diffSec < 604800) return `${Math.floor(diffSec / 86400)} d`
 
     const sameYear = d.getFullYear() === new Date().getFullYear()
-    return d.toLocaleDateString('ru-RU', {
+    return d.toLocaleDateString('ENG', {
         day: 'numeric',
         month: 'short',
         ...(sameYear ? {} : { year: 'numeric' }),

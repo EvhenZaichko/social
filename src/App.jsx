@@ -13,6 +13,7 @@ import PostPage from "./pages/PostPage.jsx";
 import Spinner from "./UI/Spinner.jsx";
 import PostForm from "./components/PostForm.jsx";
 import FollowList from "./components/followList.jsx";
+import {Toaster} from 'react-hot-toast'
 
 
 function App() {
@@ -47,11 +48,11 @@ function App() {
         setIsModalOpen(true)
     }
 
+
     const openFollowList = (data) => {
         setModalContent(<FollowList followers={data} />)
         setIsModalOpen(true)
     }
-
 
 
     if (!token) {
@@ -68,6 +69,9 @@ function App() {
     return (
         <div className="min-h-screen bg-night-900 text-white">
             <div className="flex items-start min-h-screen">
+                <Toaster position="top-center" toastOptions={{
+                    style: {background: '#1f2937', color: '#fff'}
+                }}/>
                 <Modal isModalOpen={isModalOpen} closeModal={() => setIsModalOpen(false)}>
                     {modalContent}
                 </Modal>

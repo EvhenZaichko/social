@@ -1,6 +1,5 @@
 import PostModel from "../models/PostModel.js";
 import UserModel from "../models/UserModel.js";
-import {use} from "react";
 
 class PostController  {
 
@@ -230,6 +229,36 @@ class PostController  {
         } catch (e) {
             return res.status(500).json({message: 'getProfileFeed Error'})
         }
+    }
+
+    async deletePost(req, res) {
+        try{
+            const post =  /** @type {import('../models/PostModel.js').IPost[]} */ (await PostModel.findById(req.params.id)
+            )
+            if(!post) return res.status(404).json({message: 'Post not found'})
+            if(post.author.toString() !== req.user.id) return res.status(403).json({message:"Forbidden"})
+
+            if(post.parent) {
+                await PostModel.findByIdAndUpdate(post.parent, {$pull: {replies: post._id}})
+            }
+
+            if (post.replies.length) {
+                await PostModel.deleteMany({ _id: { $in: post.replies } })
+            }
+
+            await post.deleteOne()
+
+            return res.json({
+                message: 'Post deleted',
+                postId: post._id,
+            })
+
+        } catch (e) {
+            console.log('deletePost error', e)
+            if (e.name === 'CastError') return res.status(400).json({message: 'Invalid post id'})
+            return res.status(500).json({message : 'deletePost Error'})
+        }
+
     }
 
 
