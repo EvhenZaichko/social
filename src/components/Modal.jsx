@@ -1,9 +1,11 @@
 import React from 'react';
 
-const Modal = ({isModalOpen, closeModal, children }) => {
+const Modal = ({isModalOpen, closeModal, children, align = 'center' }) => {
     return (
         <div
-            className={`fixed top-0 left-0 w-full h-full flex justify-center items-center z-20 bg-black/50 transition-opacity duration-500 ${
+            className={`fixed top-0 left-0 w-full h-full flex justify-center z-20 bg-black/50 transition-opacity duration-500 ${
+                align === 'start' ? 'items-start' : 'items-center'
+            } ${
                 isModalOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
             }`}
             onClick={closeModal}

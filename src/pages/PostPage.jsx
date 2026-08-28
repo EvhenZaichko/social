@@ -58,12 +58,13 @@ const PostPage = () => {
         }
     }, [menuOpen])
 
+
     const handleDelete = async () => {
         const deleted = await deletePost(id)
         if (deleted) navigate('/')
     }
 
-    if (loading) return <Spinner/>
+    if (loading) return <div className="w-120 mt-25"><Spinner/></div>
     if (!post)   return <div>Post not found</div>
 
     return (

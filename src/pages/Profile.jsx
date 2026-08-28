@@ -80,7 +80,7 @@ const Profile = ({openFollowList}) => {
         }
     }, [id, activeTab])
 
-    if (loading) return <Spinner/>
+    if (loading) return <div className="w-120 mt-25"><Spinner/></div>
 
     if (error || !profile) return (
         <div className="flex justify-center mt-10 text-white">

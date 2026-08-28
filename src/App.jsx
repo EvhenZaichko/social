@@ -13,12 +13,16 @@ import PostPage from "./pages/PostPage.jsx";
 import Spinner from "./UI/Spinner.jsx";
 import PostForm from "./components/PostForm.jsx";
 import FollowList from "./components/followList.jsx";
+import SearchList from "./components/SearchList.jsx"
 import {Toaster} from 'react-hot-toast'
+import {Search} from "lucide-react";
+import UserUpdate from "./components/userUpdate.jsx";
 
 
 function App() {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [modalContent, setModalContent] = useState(null)
+    const [modalAlign, setModalAlign] = useState('center')
     const location = useLocation()
     const hideAside = false
 
@@ -34,11 +38,19 @@ function App() {
 
     if (isAuthChecking) {
         return (
-            <Spinner/>
+            <div className="flex h-screen items-center justify-center bg-night-900">
+                <Spinner/>
+            </div>
         )
     }
 
+    const closeModal = () => {
+        setIsModalOpen(false)
+        setTimeout(() => setModalContent(null), 500)
+    }
+
     const OpenPostForm = () => {
+        setModalAlign('center')
         setModalContent(<div>
             <div className="flex justify-center items-center text-4xl mb-10">
                 What's new?
@@ -50,7 +62,20 @@ function App() {
 
 
     const openFollowList = (data) => {
-        setModalContent(<FollowList followers={data} />)
+        setModalAlign('center')
+        setModalContent(<FollowList followers={data} onclose={() => setIsModalOpen(false)} />)
+        setIsModalOpen(true)
+    }
+
+    const openSearchList = () => {
+        setModalAlign('start')
+        setModalContent(<SearchList onclose={() => setIsModalOpen(false)}/>)
+        setIsModalOpen(true)
+    }
+
+    const openUpdateUser = () => {
+        setModalAlign('center')
+        setModalContent(<UserUpdate onclose={closeModal}/>)
         setIsModalOpen(true)
     }
 
@@ -72,18 +97,18 @@ function App() {
                 <Toaster position="top-center" toastOptions={{
                     style: {background: '#1f2937', color: '#fff'}
                 }}/>
-                <Modal isModalOpen={isModalOpen} closeModal={() => setIsModalOpen(false)}>
+                <Modal isModalOpen={isModalOpen} closeModal={closeModal} align={modalAlign}>
                     {modalContent}
                 </Modal>
 
-                <SideBar openModal={() => setIsModalOpen(true)} openForm={OpenPostForm}/>
+                <SideBar openModal={() => setIsModalOpen(true)} openForm={OpenPostForm} openSearch={openSearchList}/>
 
                 <main className={`flex-1 flex justify-center ${hideAside ? '' : 'sm:mr-64'}`}>
                     <div>
                         <Routes>
-                            <Route path="/" element={<Feed closeModal={() => setIsModalOpen(false)}   />}/>
+                            <Route path="/" element={<Feed   />}/>
                             <Route path="profile/:id" element={<Profile openFollowList={openFollowList}/>}/>
-                            <Route path="settings" element={<Settings/>}/>
+                            <Route path="settings" element={<Settings openUpdateUser={openUpdateUser}/>}/>
                             <Route path="/post/:id" element={<PostPage/>} />
                         </Routes>
                     </div>

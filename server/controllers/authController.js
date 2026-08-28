@@ -155,7 +155,6 @@ class AuthController {
                 _id: f._id,
                 username: f.username,
                 avatar: f.avatar,
-                bio: f.bio,
                 isMe: f._id.equals(myId),
                 isFollowedByMe: me.following.some(id => id.equals(f._id)),
             }))
@@ -166,6 +165,85 @@ class AuthController {
             })
         } catch (e) {
             return  res.status(500).json({message : "getFollowersList error"})
+        }
+    }
+
+    async searchUsers(req, res) {
+        try {
+            const q = (req.query.q ?? '').trim()
+            if (!q) return res.json({users: []})
+
+            const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+            const users = await UserModel.find({
+                $or: [
+                    {username:    {$regex: escaped, $options: 'i'}},
+                    {displayName: {$regex: escaped, $options: 'i'}},
+                ],
+                _id: {$ne: req.user.id},
+            })
+                .select('username displayName avatar')
+                .limit(10)
+                .lean()
+
+            return res.json({users})
+        } catch (e) {
+            console.log('searchUsers error', e)
+            return res.status(500).json({message: 'searchUsers error'})
+        }
+    }
+
+
+    async updateUsername(req, res) {
+        const {username} = req.body;
+        const myId = req.user.id
+
+        if(typeof username !== 'string') {
+            return res.status(400).json({message:'Username required'})
+        }
+
+        const cleanName = username.trim()
+        if(cleanName.length < 3 || cleanName.length > 20) {
+            return res.status(400).json({message: 'Username must be 3-20 chars'})
+        }
+
+        try {
+            const user = await UserModel.findByIdAndUpdate(myId, {username: cleanName}, {new: true, runValidators: true}).select('_id email username followers following').lean()
+
+            if(!user) {
+                return res.res.status(404).json({message:"user not found"})
+            }
+
+            return res.json({user: user})
+
+        } catch (e) {
+            if (e.code === 11000) {
+                return res.status(409).json({message: 'Username already taken'})
+            }
+            console.log('updateUsername error', e)
+            return res.status(500).json({message: 'updateUsername error'})
+        }
+    }
+
+
+
+    async checkUsername(req, res) {
+        const username = (req.query.username ?? '').trim()
+
+        if (username.length < 3 || username.length > 20) {
+            return res.json({available: false})
+        }
+
+        try {
+            const exists = await UserModel.exists({
+                username,
+                _id: {$ne: req.user.id}
+            })
+
+            return res.json({available: !exists})
+        } catch (e) {
+            console.log('checkUsername error', e)
+            return res.status(500).json({message: 'checkUsername error'})
         }
     }
 

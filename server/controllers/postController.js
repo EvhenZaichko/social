@@ -93,8 +93,6 @@ class PostController  {
     }
 
 
-
-
     async toggleLike(req, res) {
         const userId = req.user.id
         try {
@@ -128,7 +126,6 @@ class PostController  {
     async getPostById(req, res) {
         const postId = req.params.id
         const userId = req.user.id
-
 
         try {
             const post = /** @type {import('../models/PostModel.js').IPost} */ (

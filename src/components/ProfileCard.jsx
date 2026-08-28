@@ -1,12 +1,8 @@
 import React, {useState} from 'react';
 import {useUserStore} from "../store/useUserStore.jsx";
-import axios from 'axios'
+import api from "../api/axios.js";
 
-const authHeader = () => ({
-    headers: {Authorization: `Bearer ${localStorage.getItem('token')}` }
-})
-
-const ProfileCard = ({username, followersCount, followingCount, profileId, postsCount, isFollowedByMe, isMe, openFollowList, userId}) => {
+const ProfileCard =({username, followersCount, followingCount, profileId, postsCount, isFollowedByMe, isMe, openFollowList, userId}) => {
     const following = useUserStore((s) => s.user?.following ?? [])
     const toggleFollow = useUserStore((s) => s.toggleFollow)
     const isFollowing = following.some(id => id === profileId)
@@ -17,7 +13,7 @@ const ProfileCard = ({username, followersCount, followingCount, profileId, posts
 
     const followersListHandler = async () => {
         try {
-            const {data} = await axios.get(`http://localhost:5000/authRouter/getFollowersList/${userId}`, authHeader())
+            const {data} = await api.get(`/authRouter/getFollowersList/${userId}`)
             openFollowList(data.followers)
         } catch (e) {
             console.log(e)

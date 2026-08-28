@@ -1,13 +1,11 @@
 import {create} from "zustand";
 import axios from "axios";
+import api from "../api/axios.js";
 import {usePostStore} from "./usePostStore.js";
+import toast from "react-hot-toast";
 
 
-const API = 'http://localhost:5000/authRouter'
-
-const authHeader = () => ({
-    headers: {Authorization: `Bearer ${localStorage.getItem('token')}` }
-})
+const API = '/authRouter'
 
 
  export const useUserStore = create((set, get) => ({
@@ -19,9 +17,7 @@ const authHeader = () => ({
          const token = get().token
          if (!token) return set({isAuthChecking: false})
          try {
-             const {data} = await axios.get(`${API}/me`, {
-                 headers: {Authorization: `Bearer ${token}`}
-             })
+             const {data} = await api.get(`${API}/me`)
              set({user: data.user, isAuthChecking: false})
 
          } catch (error) {
@@ -30,7 +26,7 @@ const authHeader = () => ({
                  set({user: null, token: null, isAuthChecking: false})
              } else {
                  console.log('checkAuth error', error)
-                 set({isAuthChecking: false})   // токен не трогаем
+                 set({isAuthChecking: false})
              }
          }
      },
@@ -40,7 +36,7 @@ const authHeader = () => ({
 
      registration: async (email, password, username) => {
         try {
-           const result =  await axios.post(`${API}/registration`, {email, password, username})
+           const result =  await api.post(`${API}/registration`, {email, password, username})
             return true
 
         } catch (error) {
@@ -50,7 +46,7 @@ const authHeader = () => ({
 
      login: async (email, password) => {
          try {
-            const result = await axios.post(`${API}/login`, {email, password})
+            const result = await api.post(`${API}/login`, {email, password})
 
              set({
                  user: result.data.user,
@@ -89,13 +85,47 @@ const authHeader = () => ({
          })
 
          try {
-             await axios.post(`${API}/toggleFollow`, {targetId}, authHeader())
+             await api.post(`${API}/toggleFollow`, {targetId})
          } catch (e) {
                 set({user})
              console.log('toggleFollow error', e)
          }
+     },
 
+     searchUsers: async (query, signal) => {
+         try {
+             const {data} = await api.get(`${API}/searchUsers`, {
+                 params: {q: query},
+                 signal
+             })
+             return data.users
+         } catch (e) {
+             if (axios.isCancel(e)) throw e
+             console.log('searchUsers error', e)
+             return []
+         }
+     },
 
+     updateUsername: async (username) => {
+         try {
+             const {data} = await api.post(`${API}/updateUsername`, {username})
+             set({user: data.user})
+             toast.success('Username Updated!')
+
+         } catch (e) {
+            console.log(e)
+         }
+     },
+
+     checkUsername: async (username) => {
+         try {
+            const {data} = await api.get(`${API}/checkUsername`, {
+                params: {username: username}
+            })
+             return data.available
+         } catch (e) {
+
+         }
      }
 
 

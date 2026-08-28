@@ -63,7 +63,7 @@ const Post = ({author, likes, reposts, content, replies, postId, likedByMe, date
                                     onClick={() => openPostMenu(postId)}>...</button>
                             {postMenuId === postId &&  (
                                 <div className="flex absolute right-0 top-0 z-10 w-40 h-50 rounded-xl bg-night-800 text-black shadow-lg">
-                                    <div className=" w-full ml-2 mt-2">
+                                    <div className="flex justify-center w-full mt-2">
                                         <ul className="font-bold">
                                             {authorId === userId && (
                                                 <li className="flex gap-2 text-red-600" onClick={() => deletePost(postId)}>

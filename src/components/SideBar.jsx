@@ -1,12 +1,13 @@
 import React from 'react';
-import { Home, User, Settings, Feather, LogOut } from 'lucide-react';
-import {NavLink} from 'react-router-dom'
+import { Home, User, Settings, Feather, LogOut, Search } from 'lucide-react';
+import {NavLink, useNavigate} from 'react-router-dom'
 import {useUserStore} from "../store/useUserStore.jsx";
 
 
 
-const SideBar = ({openForm}) => {
+const SideBar = ({openForm, openSearch}) => {
     const user = useUserStore((s) => s.user)
+    const navigate = useNavigate()
 
     const navItems = [
         { icon: Home,     label: 'Home',     link: '/' },
@@ -17,8 +18,7 @@ const SideBar = ({openForm}) => {
 
 
     return (
-
-            <nav className="sticky top-0 left-0 h-screen  w-64 hidden sm:flex flex-col gap-1 p-3">
+            <nav className="sticky top-0 left-0 h-screen  w-64 hidden sm:flex flex-col justify-center gap-1 p-3">
                 {navItems.map(({ icon: Icon, label, link }) => (
                     <NavLink
                         to={link}
@@ -34,7 +34,13 @@ const SideBar = ({openForm}) => {
                     </NavLink>
                 ))}
                 <div>
-                    <Feather className="ml-4 mt-1  text-green-300 hover:text-white cursor-pointer" onClick={openForm}/>
+                    <Search className="ml-4 mt-2  text-white cursor-pointer" onClick={openSearch} />
+                </div>
+                <div>
+                    <Feather className="ml-4 mt-4  text-green-300 hover:text-white cursor-pointer" onClick={() => {
+                        navigate('/')
+                        openForm()
+                    }}/>
                 </div>
             </nav>
     );

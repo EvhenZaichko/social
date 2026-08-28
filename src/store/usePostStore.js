@@ -1,12 +1,9 @@
 import {create} from 'zustand'
 import axios from "axios";
+import api from "../api/axios.js";
 import toast from 'react-hot-toast'
 
-const API = 'http://localhost:5000/postRouter'
-
-const authHeader = () => ({
-    headers: {Authorization: `Bearer ${localStorage.getItem('token')}` }
-})
+const API = '/postRouter'
 
 export const usePostStore = create((set, get) => ({
 
@@ -15,7 +12,7 @@ export const usePostStore = create((set, get) => ({
 
     createPost: async (content) => {
         try {
-            const result = await axios.post(`${API}/createPost`, {content}, authHeader())
+            const result = await api.post(`${API}/createPost`, {content})
             const post = result.data.post
             set({posts: [ post, ...get().posts ]})
         } catch (e) {
@@ -26,8 +23,7 @@ export const usePostStore = create((set, get) => ({
 
     getAllPosts: async (tab, signal) => {
         try {
-            const {data} = await axios.get(`${API}/getPosts`,  {
-                ...authHeader(),
+            const {data} = await api.get(`${API}/getPosts`,  {
                 params: {tab: tab.toLocaleLowerCase()},
                 signal
             })
@@ -63,7 +59,7 @@ export const usePostStore = create((set, get) => ({
         })
 
         try {
-            const { data } = await axios.post(`${API}/toggleLike/${postId}`, null, authHeader())
+            const { data } = await api.post(`${API}/toggleLike/${postId}`, null)
 
             const apply = (p) => ({ ...p, likedByMe: data.liked, likesCount: data.likesCount })
 
@@ -82,7 +78,7 @@ export const usePostStore = create((set, get) => ({
 
     getPostById: async (postId) => {
         try {
-            const {data} = await axios.get(`${API}/getPostById/${postId}`, authHeader())
+            const {data} = await api.get(`${API}/getPostById/${postId}`)
             return  data.post
 
         } catch (e) {
@@ -94,7 +90,7 @@ export const usePostStore = create((set, get) => ({
 
     getProfile: async (id, signal) => {
         try {
-            const {data} = await axios.get(`${API}/getProfile/${id}`, {...authHeader(), signal})
+            const {data} = await api.get(`${API}/getProfile/${id}`, {signal})
             return data.profile
         } catch (e) {
             console.log('getProfile error', e)
@@ -106,8 +102,7 @@ export const usePostStore = create((set, get) => ({
 
     getProfileFeed: async (userId, tab, signal) => {
         try {
-            const {data} = await axios.get(`${API}/getProfileFeed/${userId}`, {
-                ...authHeader(),
+            const {data} = await api.get(`${API}/getProfileFeed/${userId}`, {
                 params: {tab: tab.toLocaleLowerCase()},
                 signal
             })
@@ -120,7 +115,7 @@ export const usePostStore = create((set, get) => ({
 
     deletePost: async (postId) => {
         try {
-            await axios.delete(`${API}/deletePost/${postId}`, authHeader())
+            await api.delete(`${API}/deletePost/${postId}`)
             set({posts: get().posts.filter(post => post._id !== postId)})
             toast.success('Post Deleted!')
             return true

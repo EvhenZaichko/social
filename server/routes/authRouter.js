@@ -10,5 +10,8 @@ router.post('/login', controller.login)
 router.get('/me', authMiddleWire, controller.me)
 router.post('/toggleFollow', authMiddleWire, controller.toggleFollow)
 router.get('/getFollowersList/:id', authMiddleWire, controller.getFollowersList)
+router.get('/searchUsers', authMiddleWire, controller.searchUsers)
+router.post('/updateUsername',authMiddleWire, controller.updateUsername)
+router.get('/checkUsername',authMiddleWire, controller.checkUsername)
 
 export default router
