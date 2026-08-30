@@ -1,13 +1,17 @@
 import React from 'react';
-import { Home, User, Settings, Feather, LogOut, Search } from 'lucide-react';
+import { Home, User, Settings, Feather, Search } from 'lucide-react';
 import {NavLink, useNavigate} from 'react-router-dom'
 import {useUserStore} from "../store/useUserStore.jsx";
+import {useModalStore} from "../store/useModalStore.js";
+import SearchList from "./SearchList.jsx";
+import PostForm from "./PostForm.jsx";
 
 
 
-const SideBar = ({openForm, openSearch}) => {
+const SideBar = () => {
     const user = useUserStore((s) => s.user)
     const navigate = useNavigate()
+    const Open = useModalStore((s) => s.Open)
 
     const navItems = [
         { icon: Home,     label: 'Home',     link: '/' },
@@ -15,6 +19,17 @@ const SideBar = ({openForm, openSearch}) => {
         { icon: Settings, label: 'Settings', link: '/settings' },
     ];
 
+    const openPostForm = () => {
+        navigate('/')
+        Open(
+            <div>
+                <div className="flex justify-center items-center text-4xl mb-10">
+                    What's new?
+                </div>
+                <PostForm/>
+            </div>
+        )
+    }
 
 
     return (
@@ -34,13 +49,12 @@ const SideBar = ({openForm, openSearch}) => {
                     </NavLink>
                 ))}
                 <div>
-                    <Search className="ml-4 mt-2  text-white cursor-pointer" onClick={openSearch} />
+                    <Search className="ml-4 mt-2  text-white cursor-pointer"
+                            onClick={() => Open(<SearchList/>, 'start')} />
                 </div>
                 <div>
-                    <Feather className="ml-4 mt-4  text-green-300 hover:text-white cursor-pointer" onClick={() => {
-                        navigate('/')
-                        openForm()
-                    }}/>
+                    <Feather className="ml-4 mt-4  text-green-300 hover:text-white cursor-pointer"
+                             onClick={openPostForm}/>
                 </div>
             </nav>
     );

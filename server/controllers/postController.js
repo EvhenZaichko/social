@@ -1,5 +1,6 @@
 import PostModel from "../models/PostModel.js";
 import UserModel from "../models/UserModel.js";
+import mongoose from "mongoose";
 
 class PostController  {
 
@@ -59,6 +60,12 @@ class PostController  {
     async getPosts(req, res) {
         const userId = req.user.id
         const tab = req.query.tab ?? 'all'
+        const { cursor } = req.query
+        const limit = Math.max(1, Math.min(Number(req.query.limit) || 20, 50))
+
+        if (cursor && !mongoose.isValidObjectId(cursor)) {
+            return res.status(400).json({ message: 'Invalid cursor' })
+        }
 
         try {
             let filter = {parent: null}
@@ -70,22 +77,30 @@ class PostController  {
                 filter = { ...filter, author: { $in: [...me.following] } }
             }
 
+            if (cursor) filter = { ...filter, _id: { $lt: cursor } }
 
             const posts = /** @type {import('../models/PostModel.js').IPost[]} */ (
                 await PostModel.find(filter)
-                .populate('author', 'username email')
-                .sort({ createdAt: -1 })
-                .lean()
+                    .populate('author', 'username email')
+                    .sort({ _id: -1 })
+                    .limit(limit + 1)
+                    .lean()
             )
 
-                const result = posts.map(({likes, ...post }) =>({
-                    ...post,
-                    date: post.createdAt,
-                    likesCount: likes.length,
-                    likedByMe:  likes.some(id => id.equals(userId))
-                }))
+            const hasMore = posts.length > limit
+            const page = hasMore ? posts.slice(0, limit) : posts
 
-            return res.json({ posts: result })
+            const result = page.map(({likes, ...post }) => ({
+                ...post,
+                date: post.createdAt,
+                likesCount: likes.length,
+                likedByMe: likes.some(id => id.equals(userId))
+            }))
+
+            return res.json({
+                posts: result,
+                nextCursor: hasMore ? page[page.length - 1]._id : null,
+            })
         } catch (e) {
             console.log('get posts error', e)
             return res.status(500).json({ message: 'get posts error' })
@@ -121,8 +136,6 @@ class PostController  {
         }
     }
 
-
-
     async getPostById(req, res) {
         const postId = req.params.id
         const userId = req.user.id
@@ -154,8 +167,6 @@ class PostController  {
             return res.status(500).json({message: 'GetPostById error'})
         }
     }
-
-
 
 
     async getProfile(req, res) {
@@ -193,40 +204,55 @@ class PostController  {
     }
 
 
-
     async getProfileFeed(req, res) {
         const myId = req.user.id
         const userId = req.params.id
         const tab = req.query.tab ?? 'posts'
+        const { cursor } = req.query
+        const limit = Math.max(1, Math.min(Number(req.query.limit) || 20, 50))
 
         const filters = {
             posts: {author: userId, parent: null},
             likes: {likes: userId }
         }
 
-        const filter = filters[tab]
-        if(!filters[tab]) return res.status(400).json({message: 'unknown tab'})
+        if (!filters[tab]) return res.status(400).json({message: 'unknown tab'})
+        if (cursor && !mongoose.isValidObjectId(cursor)) {
+            return res.status(400).json({ message: 'Invalid cursor' })
+        }
+
+        const filter = cursor
+            ? { ...filters[tab], _id: { $lt: cursor } }
+            : filters[tab]
 
         try {
-            const posts =  /** @type {import('../models/PostModel.js').IPost[]} */ (await PostModel.find(filter)
+            const posts = /** @type {import('../models/PostModel.js').IPost[]} */ (
+                await PostModel.find(filter)
                     .populate('author', 'username email')
-                    .sort({createdAt: -1})
+                    .sort({_id: -1})
+                    .limit(limit + 1)
                     .lean()
             )
 
-            const result = posts.map(({ likes, ...post }) => ({
+            const hasMore = posts.length > limit
+            const page = hasMore ? posts.slice(0, limit) : posts
+
+            const result = page.map(({ likes, ...post }) => ({
                 ...post,
                 date: post.createdAt,
                 likesCount: likes.length,
                 likedByMe: likes.some(likeId => likeId.equals(myId)),
             }))
 
-            return res.json({posts: result})
-
+            return res.json({
+                posts: result,
+                nextCursor: hasMore ? page[page.length - 1]._id : null,
+            })
         } catch (e) {
             return res.status(500).json({message: 'getProfileFeed Error'})
         }
     }
+
 
     async deletePost(req, res) {
         try{
@@ -243,7 +269,7 @@ class PostController  {
                 await PostModel.deleteMany({ _id: { $in: post.replies } })
             }
 
-            await post.deleteOne()
+            await post.delete
 
             return res.json({
                 message: 'Post deleted',

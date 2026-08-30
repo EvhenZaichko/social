@@ -1,8 +1,10 @@
 import React from 'react';
 import {useUserStore} from "../store/useUserStore.jsx";
 import {useNavigate} from "react-router-dom";
+import {useModalStore} from "../store/useModalStore.js";
 
-const FollowList = ({followers, onclose}) => {
+const FollowList = ({followers}) => {
+    const Close = useModalStore((s) => s.Close)
     const myId = useUserStore((s) => s.user?._id)
     const following = useUserStore((s) => s.user?.following ?? [])
     const toggleFollow = useUserStore((s) => s.toggleFollow)
@@ -11,7 +13,7 @@ const FollowList = ({followers, onclose}) => {
 
     const redirectToProfile = (id) => {
         navigate(`profile/${id}`)
-        onclose()
+        Close()
     }
 
 

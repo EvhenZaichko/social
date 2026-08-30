@@ -9,6 +9,8 @@ export const usePostStore = create((set, get) => ({
 
     posts: [],
     currentPost: null,
+    nextCursor: null,
+    isLoadingMore: false,
 
     createPost: async (content) => {
         try {
@@ -21,21 +23,36 @@ export const usePostStore = create((set, get) => ({
 
     },
 
-    getAllPosts: async (tab, signal) => {
+  loadFeed: async (tab, signal) => {
+        const {data} = await api.get(`${API}/getPosts`, {
+            params: {tab: tab.toLocaleLowerCase(), limit: 3},
+            signal
+        })
+      set({posts: data.posts, nextCursor: data.nextCursor})
+  },
+
+    loadMoreFeed: async (tab, signal) => {
+        const {nextCursor, isLoadingMore} = get()
+        if(!nextCursor || isLoadingMore) return
+
+        set({isLoadingMore: true})
         try {
-            const {data} = await api.get(`${API}/getPosts`,  {
-                params: {tab: tab.toLocaleLowerCase()},
+            const {data} = await api.get(`${API}/getPosts`, {
+                params: {tab: tab.toLocaleLowerCase(), limit: 3, cursor: nextCursor},
                 signal
             })
-            return data.posts
+
+            const current = get().posts
+
+            set({posts: [...current, ...data.posts], nextCursor: data.nextCursor})
         } catch (e) {
-            if (!axios.isCancel(e)) console.log('getAllPosts error', e)
-            throw e
+            if (!axios.isCancel(e)) console.log("loadMoreFeedError", e)
+        } finally {
+            set({isLoadingMore: false})
         }
     },
 
-
-
+    resetFeed: () => set({posts: [], nextCursor: null, isLoadingMore: false}),
 
     toggleLike: async (postId) => {
         const prev = { posts: get().posts, currentPost: get().currentPost }

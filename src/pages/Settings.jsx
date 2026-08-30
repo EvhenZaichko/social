@@ -1,9 +1,12 @@
 import React from 'react';
 import {LogOut, AtSign, Mail, ChevronRight} from "lucide-react";
 import {useUserStore} from "../store/useUserStore.jsx";
+import {useModalStore} from "../store/useModalStore.js";
+import UserUpdate from "../components/userUpdate.jsx";
 
-const Settings = ({openUpdateUser}) => {
+const Settings = () => {
     const logout = useUserStore((s) => s.logout)
+    const Open = useModalStore((s) => s.Open)
     const username = useUserStore((s) => s.user?.username ?? '')
     const email = useUserStore((s) => s.user?.email ?? '')
 
@@ -21,7 +24,7 @@ const Settings = ({openUpdateUser}) => {
                 </h2>
 
                 <button
-                    onClick={openUpdateUser}
+                    onClick={() => Open(<UserUpdate/>)}
                     className="flex w-full items-center gap-4 px-4 py-4 text-left transition-colors hover:bg-night-850"
                 >
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-night-800">

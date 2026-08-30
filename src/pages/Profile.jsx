@@ -14,7 +14,7 @@ const EMPTY = {
     Likes : 'You do not have liked posts yet'
 }
 
-const Profile = ({openFollowList}) => {
+const Profile = () => {
 
     const {id} = useParams()
 
@@ -92,15 +92,7 @@ const Profile = ({openFollowList}) => {
 
     return (
         <div className="text-white space-y-3 ">
-            <ProfileCard username={profile.username}
-                         followersCount={profile.followersCount}
-                         followingCount={profile.followingCount}
-                         profileId={id} postsCount={posts.length}
-                         isMe={profile.isMe}
-                         isFollowedByMe={profile.isFollowedByMe}
-                         openFollowList={openFollowList}
-                         userId={id}
-            />
+            <ProfileCard profile={profile}/>
             <div className="flex justify-between mr-5 ml-5 mb-10 text-gray-500">
                 {TABS.map(tab => (
                     <button key={tab}

@@ -1,20 +1,23 @@
 import React, {useState} from 'react';
 import {useUserStore} from "../store/useUserStore.jsx";
 import api from "../api/axios.js";
+import {useModalStore} from "../store/useModalStore.js";
+import FollowList from "./followList.jsx";
 
-const ProfileCard =({username, followersCount, followingCount, profileId, postsCount, isFollowedByMe, isMe, openFollowList, userId}) => {
+const ProfileCard =({profile}) => {
+    const {_id, username, followersCount, followingCount, postsCount, isFollowedByMe, isMe} = profile
+
+    const Open = useModalStore((s) => s.Open)
     const following = useUserStore((s) => s.user?.following ?? [])
     const toggleFollow = useUserStore((s) => s.toggleFollow)
-    const isFollowing = following.some(id => id === profileId)
+    const isFollowing = following.some(id => id === _id)
 
     const adjustedFollowers = followersCount + (Number(isFollowing) - Number(isFollowedByMe))
 
-    const toggle = () => toggleFollow(profileId)
-
     const followersListHandler = async () => {
         try {
-            const {data} = await api.get(`/authRouter/getFollowersList/${userId}`)
-            openFollowList(data.followers)
+            const {data} = await api.get(`/authRouter/getFollowersList/${_id}`)
+            Open(<FollowList followers={data.followers}/>)
         } catch (e) {
             console.log(e)
         }
@@ -41,7 +44,7 @@ const ProfileCard =({username, followersCount, followingCount, profileId, postsC
                         <span>post</span>
                     </div>
                 </div>
-                <div className="mt-5" onClick={toggle}>
+                <div className="mt-5" onClick={() => toggleFollow(_id)}>
                     {!isMe && <div className={`px-7 py-3 rounded-2xl w-30 flex items-center justify-center cursor-pointer transition-colors duration-500 hover:bg-night-800 ${isFollowing ? 'bg-transparent border-white border-2' : 'bg-gray-600'}`}>
                         {isFollowing ? 'Following' : 'Follow'}
                     </div>}

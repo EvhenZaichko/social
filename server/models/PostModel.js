@@ -16,6 +16,10 @@ const PostSchema = new Schema({
     timestamps: true,
 });
 
+PostSchema.index({ parent: 1, _id: -1 })
+PostSchema.index({ author: 1, parent: 1, _id: -1 })
+PostSchema.index({ likes: 1, _id: -1 })
+
 /**
  * @typedef {Object} PostDoc
  * @property {import('mongoose').Types.ObjectId} _id

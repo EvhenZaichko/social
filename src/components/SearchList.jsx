@@ -3,9 +3,11 @@ import axios from 'axios';
 import {useUserStore} from "../store/useUserStore.jsx";
 import {useNavigate} from "react-router-dom";
 import Spinner from "../UI/Spinner.jsx";
+import {useModalStore} from "../store/useModalStore.js";
 
-const SearchList = ({onclose}) => {
+const SearchList = () => {
     const navigate = useNavigate()
+    const Close = useModalStore((s) => s.Close)
 
     const [query, setQuery] = useState('')
     const [loading, setLoading] = useState(false)
@@ -46,7 +48,7 @@ const SearchList = ({onclose}) => {
 
     const redirectToProfile = (id) => {
         navigate(`profile/${id}`)
-        onclose()
+        Close()
     }
 
     const hasQuery = query.trim().length > 0

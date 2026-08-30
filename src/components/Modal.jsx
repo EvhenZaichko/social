@@ -1,22 +1,26 @@
 import React from 'react';
+import {useModalStore} from "../store/useModalStore.js";
 
-const Modal = ({isModalOpen, closeModal, children, align = 'center' }) => {
+const Modal = () => {
+    const isOpen  = useModalStore((s) => s.isOpen)
+    const content = useModalStore((s) => s.content)
+    const align   = useModalStore((s) => s.align)
+    const onClose = useModalStore((s) => s.Close)
+
     return (
         <div
             className={`fixed top-0 left-0 w-full h-full flex justify-center z-20 bg-black/50 transition-opacity duration-500 ${
                 align === 'start' ? 'items-start' : 'items-center'
             } ${
-                isModalOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
             }`}
-            onClick={closeModal}
+            onClick={onClose}
         >
             <div
-                className={`rounded-3xl relative transition-all duration-500 ${
-                    isModalOpen ? 'scale-100' : 'scale-95'
-                }`}
+                className={`rounded-3xl relative transition-all duration-500 ${isOpen ? 'scale-100' : 'scale-95'}`}
                 onClick={(e) => e.stopPropagation()}
             >
-                {children}
+                {content}
             </div>
         </div>
     );

@@ -5,8 +5,6 @@ import authMiddleWire from "../middleWire/authMiddleWire.js";
 import mongoose from 'mongoose';
 
 
-
-
 const generateToken = (id, username, email) => {
     const payload = {
         id,
@@ -226,7 +224,6 @@ class AuthController {
     }
 
 
-
     async checkUsername(req, res) {
         const username = (req.query.username ?? '').trim()
 
@@ -246,7 +243,6 @@ class AuthController {
             return res.status(500).json({message: 'checkUsername error'})
         }
     }
-
 
 
 }

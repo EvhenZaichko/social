@@ -1,15 +1,17 @@
 import React, {useState} from 'react';
 import {usePostStore} from "../store/usePostStore.js";
+import {useModalStore} from "../store/useModalStore.js";
 
-const PostForm = ({closeModal}) => {
+const PostForm = () => {
     const [text, setText] = useState('')
     const canPost = text.trim().length > 0
     const createPost = usePostStore((s) => s.createPost)
+    const Close = useModalStore((s) => s.Close)
 
     const addPost = () => {
         createPost(text)
         setText('')
-        closeModal()
+        Close()
         }
 
     return (

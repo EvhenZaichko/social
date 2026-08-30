@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react';
-import Post from "./Post.jsx";
+import React, {useEffect, useRef, useState} from 'react';
 import PostList from "./PostList.jsx";
 import PostForm from "./PostForm.jsx";
 import {usePostStore} from "../store/usePostStore.js";
@@ -10,11 +9,16 @@ import axios from "axios";
 
 const Feed = () => {
     const posts = usePostStore((s) => s.posts)
-    const getAllPosts = usePostStore((s) => s.getAllPosts)
+    const nextCursor = usePostStore((s) => s.nextCursor)
+    const isLoadingMore = usePostStore((s) => s.isLoadingMore)
+    const loadFeed = usePostStore((s) => s.loadFeed)
+    const loadMoreFeed = usePostStore((s) => s.loadMoreFeed)
+    const resetFeed = usePostStore((s) => s.resetFeed)
 
     const [activeTab, setActiveTab] = useState('all')
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const sentinelRef = useRef(null)
 
     useEffect(() => {
         const controller = new AbortController()
@@ -23,8 +27,7 @@ const Feed = () => {
             setLoading(true)
             setError(null)
             try {
-                const data = await getAllPosts(activeTab, controller.signal)
-                usePostStore.setState({posts: data ?? []})
+                await loadFeed(activeTab, controller.signal)
                 setLoading(false)
             } catch (e) {
                 if (axios.isCancel(e)) return
@@ -36,9 +39,27 @@ const Feed = () => {
         loadPosts()
         return () => {
             controller.abort()
-            usePostStore.setState({posts: []})
+            resetFeed()
         }
-    }, [activeTab])
+    }, [activeTab, loadFeed, resetFeed])
+
+    useEffect(() => {
+        const el = sentinelRef.current
+        if (!el || !nextCursor) return
+
+        const controller = new AbortController()
+
+        const observer = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) loadMoreFeed(activeTab, controller.signal) },
+            {rootMargin: '400px'}
+        )
+
+        observer.observe(el)
+        return () => {
+            observer.disconnect()
+            controller.abort()
+        }
+    }, [nextCursor, activeTab, loadMoreFeed])
 
     return (
         <div>
@@ -50,10 +71,17 @@ const Feed = () => {
             ) : error ? (
                 <div className="flex justify-center mt-5 text-gray-500">{error}</div>
             ) : posts.length > 0 ? (
-                <PostList/>
+                <>
+                    <PostList/>
+                    {isLoadingMore && (
+                        <div className="flex justify-center mt-5"><Spinner/></div>
+                    )}
+                </>
             ) : (
                 <div className="flex justify-center mt-5 text-gray-500">Posts not found</div>
             )}
+
+            <div ref={sentinelRef} className="h-10"/>
         </div>
     );
 };
