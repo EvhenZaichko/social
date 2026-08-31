@@ -4,7 +4,7 @@ import {useNavigate} from "react-router-dom";
 import {Heart, MessageCircle, ChartNoAxesCombined, Repeat2, Trash } from 'lucide-react';
 import {usePostStore} from "../store/usePostStore.js";
 import {formatPostDate} from "../utils/formatDate.js";
-import {useUserStore} from "../store/useUserStore.jsx";
+import {useUserStore} from "../store/useUserStore.js";
 
 
 const Post = ({author, likes, reposts, content, replies, postId, likedByMe, date, postMenuId, setPostMenuId, onClose}) => {

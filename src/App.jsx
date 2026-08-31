@@ -7,7 +7,7 @@ import Profile from "./pages/Profile.jsx";
 import Login from "./pages/Login.jsx";
 import {useEffect} from "react";
 import Registration from "./pages/Registration.jsx";
-import {useUserStore} from "./store/useUserStore.jsx";
+import {useUserStore} from "./store/useUserStore.js";
 import PostPage from "./pages/PostPage.jsx";
 import Spinner from "./UI/Spinner.jsx";
 import {Toaster} from 'react-hot-toast'

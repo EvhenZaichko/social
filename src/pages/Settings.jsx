@@ -1,6 +1,6 @@
 import React from 'react';
 import {LogOut, AtSign, Mail, ChevronRight} from "lucide-react";
-import {useUserStore} from "../store/useUserStore.jsx";
+import {useUserStore} from "../store/useUserStore.js";
 import {useModalStore} from "../store/useModalStore.js";
 import UserUpdate from "../components/userUpdate.jsx";
 

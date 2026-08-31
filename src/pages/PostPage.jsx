@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { usePostStore } from "../store/usePostStore.js";
-import { useUserStore } from "../store/useUserStore.jsx";
+import { useUserStore } from "../store/useUserStore.js";
 import Spinner from "../UI/Spinner.jsx";
 import {ChartNoAxesCombined, Heart, MessageCircle, Repeat2, Trash} from "lucide-react";
 

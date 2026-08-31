@@ -1,4 +1,4 @@
-import React, {use, useEffect, useState} from 'react';
+import React, {use, useEffect, useRef, useState} from 'react';
 import ProfileCard from "../components/ProfileCard.jsx";
 import PostList from "../components/PostList.jsx";
 import {usePostStore} from "../store/usePostStore.js";
@@ -24,7 +24,14 @@ const Profile = () => {
 
     const posts = usePostStore((s) => s.posts)
     const getProfile = usePostStore((s) => s.getProfile)
-    const getProfileFeed = usePostStore((s) => s.getProfileFeed)
+    const profileNextCursor = usePostStore((s) => s.profileNextCursor)
+    const isLoadingMoreProfile = usePostStore((s) => s.isLoadingMoreProfile)
+    const loadProfileFeed = usePostStore((s) => s.loadProfileFeed)
+    const loadMoreProfileFeed = usePostStore((s) => s.loadMoreProfileFeed)
+    const resetProfileFeed = usePostStore((s) => s.resetProfileFeed)
+
+    const sentinelRef = useRef(null)
+
 
     const [profile, setProfile] = useState(null)
     const [activeTab, setActiveTab] = useState('Posts')
@@ -63,22 +70,44 @@ const Profile = () => {
 
         const loadPosts = async () => {
             setTabLoading(true)
-
             try {
-                const feed = await getProfileFeed(id, activeTab, controller.signal)
-                if(active) usePostStore.setState({posts: feed})
+                await loadProfileFeed(id, activeTab, controller.signal)
             } catch (e) {
                 if (active && !axios.isCancel(e)) setError('failed to load profile feed')
             } finally {
-                if(active) setTabLoading(false)
+                if (active) setTabLoading(false)
             }
         }
+
         loadPosts()
         return () => {
             active = false
             controller.abort()
+            resetProfileFeed()
         }
-    }, [id, activeTab])
+    }, [id, activeTab, loadProfileFeed, resetProfileFeed])
+
+
+    useEffect(() => {
+        const el = sentinelRef.current
+        if (!el || !profileNextCursor) return
+
+        const controller = new AbortController()
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) loadMoreProfileFeed(id, activeTab, controller.signal)
+            },
+            {rootMargin: '400px'}
+        )
+
+        observer.observe(el)
+        return () => {
+            observer.disconnect()
+            controller.abort()
+        }
+    }, [profileNextCursor, id, activeTab, loadMoreProfileFeed])
+
 
     if (loading) return <div className="w-120 mt-25"><Spinner/></div>
 
@@ -87,7 +116,6 @@ const Profile = () => {
             <span>{error ?? 'Profile not found'}</span>
         </div>
     )
-
 
 
     return (
@@ -110,13 +138,20 @@ const Profile = () => {
             {tabLoading ? (
                 <div className="flex justify-center mt-5"><Spinner/></div>
             ) : posts.length ? (
-                    <PostList/>
+                    <>
+                        <PostList/>
+                        {isLoadingMoreProfile && (
+                            <div className="flex justify-center mt-5"><Spinner/></div>
+                        )}
+                    </>
+
             ) : (
                 <div className="flex justify-center items-center mt-5">
                     <span>{EMPTY[activeTab]}</span>
                 </div>
             )}
 
+            <div ref={sentinelRef} className="h-10"/>
         </div>
     );
 };

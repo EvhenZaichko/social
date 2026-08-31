@@ -43,6 +43,7 @@ const Feed = () => {
         }
     }, [activeTab, loadFeed, resetFeed])
 
+
     useEffect(() => {
         const el = sentinelRef.current
         if (!el || !nextCursor) return
@@ -60,6 +61,8 @@ const Feed = () => {
             controller.abort()
         }
     }, [nextCursor, activeTab, loadMoreFeed])
+
+
 
     return (
         <div>

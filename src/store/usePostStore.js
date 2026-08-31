@@ -11,6 +11,8 @@ export const usePostStore = create((set, get) => ({
     currentPost: null,
     nextCursor: null,
     isLoadingMore: false,
+    profileNextCursor: null,
+    isLoadingMoreProfile: false,
 
     createPost: async (content) => {
         try {
@@ -23,13 +25,18 @@ export const usePostStore = create((set, get) => ({
 
     },
 
+
+
+
   loadFeed: async (tab, signal) => {
         const {data} = await api.get(`${API}/getPosts`, {
-            params: {tab: tab.toLocaleLowerCase(), limit: 3},
+            params: {tab: tab.toLocaleLowerCase(), limit: 10},
             signal
         })
       set({posts: data.posts, nextCursor: data.nextCursor})
   },
+
+
 
     loadMoreFeed: async (tab, signal) => {
         const {nextCursor, isLoadingMore} = get()
@@ -52,7 +59,50 @@ export const usePostStore = create((set, get) => ({
         }
     },
 
+
     resetFeed: () => set({posts: [], nextCursor: null, isLoadingMore: false}),
+
+
+
+    loadProfileFeed: async (userId, tab, signal) => {
+        const {data} = await api.get(`${API}/getProfileFeed/${userId}`, {
+            params: {tab: tab.toLocaleLowerCase(), limit: 10},
+            signal
+        })
+        set({posts: data.posts, profileNextCursor: data.nextCursor})
+    },
+
+
+
+
+    loadMoreProfileFeed: async (userId, tab, signal) => {
+        const {profileNextCursor, isLoadingMoreProfile} = get()
+        if (!profileNextCursor || isLoadingMoreProfile) return
+
+        set({isLoadingMoreProfile: true})
+        try {
+            const {data} = await api.get(`${API}/getProfileFeed/${userId}`, {
+                params: {tab: tab.toLocaleLowerCase(), limit: 3, cursor: profileNextCursor},
+                signal
+            })
+            set({
+                posts: [...get().posts, ...data.posts],
+                profileNextCursor: data.nextCursor,
+            })
+        } catch (e) {
+            if (!axios.isCancel(e)) console.log('loadMoreProfileFeed error', e)
+        } finally {
+            set({isLoadingMoreProfile: false})
+        }
+    },
+
+
+
+
+    resetProfileFeed: () => set({posts: [], profileNextCursor: null, isLoadingMoreProfile: false}),
+
+
+
 
     toggleLike: async (postId) => {
         const prev = { posts: get().posts, currentPost: get().currentPost }
@@ -93,6 +143,9 @@ export const usePostStore = create((set, get) => ({
 
 
 
+
+
+
     getPostById: async (postId) => {
         try {
             const {data} = await api.get(`${API}/getPostById/${postId}`)
@@ -102,6 +155,9 @@ export const usePostStore = create((set, get) => ({
             console.log('GetPostById error', e)
         }
     },
+
+
+
 
 
 
@@ -117,18 +173,8 @@ export const usePostStore = create((set, get) => ({
 
 
 
-    getProfileFeed: async (userId, tab, signal) => {
-        try {
-            const {data} = await api.get(`${API}/getProfileFeed/${userId}`, {
-                params: {tab: tab.toLocaleLowerCase()},
-                signal
-            })
-            return data.posts
-        } catch (e) {
-            console.log('getProfileFeed error', e)
-            throw e
-        }
-    },
+
+
 
     deletePost: async (postId) => {
         try {

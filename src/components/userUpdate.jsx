@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {useUserStore} from "../store/useUserStore.jsx";
+import {useUserStore} from "../store/useUserStore.js";
 import {useModalStore} from "../store/useModalStore.js";
 
 const UserUpdate = () => {
     const Close = useModalStore((s) => s.Close)
 
-    const currentUsername = useUserStore((s) => s.user.username)
+    const currentUsername = useUserStore((s) => s.user?.username)
     const updateUsername = useUserStore((s) => s.updateUsername)
     const checkUsername = useUserStore((s) => s.checkUsername)
 
@@ -31,7 +31,6 @@ const UserUpdate = () => {
         updateUsername(username)
         Close()
     }
-
 
 
     return (

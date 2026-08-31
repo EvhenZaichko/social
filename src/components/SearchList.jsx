@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import {useUserStore} from "../store/useUserStore.jsx";
+import {useUserStore} from "../store/useUserStore.js";
 import {useNavigate} from "react-router-dom";
 import Spinner from "../UI/Spinner.jsx";
 import {useModalStore} from "../store/useModalStore.js";

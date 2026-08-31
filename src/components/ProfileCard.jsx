@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useUserStore} from "../store/useUserStore.jsx";
+import {useUserStore} from "../store/useUserStore.js";
 import api from "../api/axios.js";
 import {useModalStore} from "../store/useModalStore.js";
 import FollowList from "./followList.jsx";

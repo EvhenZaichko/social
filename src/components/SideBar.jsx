@@ -1,7 +1,7 @@
 import React from 'react';
 import { Home, User, Settings, Feather, Search } from 'lucide-react';
 import {NavLink, useNavigate} from 'react-router-dom'
-import {useUserStore} from "../store/useUserStore.jsx";
+import {useUserStore} from "../store/useUserStore.js";
 import {useModalStore} from "../store/useModalStore.js";
 import SearchList from "./SearchList.jsx";
 import PostForm from "./PostForm.jsx";

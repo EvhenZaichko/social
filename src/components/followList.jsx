@@ -1,5 +1,5 @@
 import React from 'react';
-import {useUserStore} from "../store/useUserStore.jsx";
+import {useUserStore} from "../store/useUserStore.js";
 import {useNavigate} from "react-router-dom";
 import {useModalStore} from "../store/useModalStore.js";
 

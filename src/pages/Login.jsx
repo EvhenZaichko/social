@@ -1,6 +1,6 @@
 import React, {use, useState} from 'react';
 import {Navigate, useNavigate} from "react-router-dom";
-import {useUserStore} from "../store/useUserStore.jsx";
+import {useUserStore} from "../store/useUserStore.js";
 
 
 
