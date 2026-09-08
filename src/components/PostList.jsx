@@ -10,7 +10,7 @@ const PostList = () => {
     const onClose = useCallback(() => setPostMenuId(null), [])
 
     return (
-        <div className="space-y-5">
+        <div className="w-120 border-t border-night-700">
             {posts.map(p => <Post key={p._id}
                                   author={p.author}
                                   content={p.content}

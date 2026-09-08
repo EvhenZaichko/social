@@ -68,6 +68,18 @@ const API = '/authRouter'
          usePostStore.setState({posts: []})
      },
 
+
+     getProfile: async (id, signal) => {
+         try {
+             const {data} = await api.get(`${API}/getProfile/${id}`, {signal})
+             return data.profile
+         } catch (e) {
+             console.log('getProfile error', e)
+             throw e
+         }
+     },
+
+
      toggleFollow: async  (targetId) => {
          const {user} = get()
          if( !user ||user._id === targetId) return
@@ -109,11 +121,12 @@ const API = '/authRouter'
      updateUsername: async (username) => {
          try {
              const {data} = await api.post(`${API}/updateUsername`, {username})
-             set({user: data.user})
+             set(s => ({user: {...s.user, ...data.user}}))
              toast.success('Username Updated!')
 
          } catch (e) {
-            console.log(e)
+            console.log('updateUsername error',e)
+            toast.error(e.response?.data?.message ?? 'Failed to update username')
          }
      },
 
@@ -126,7 +139,22 @@ const API = '/authRouter'
          } catch (e) {
 
          }
+     },
+
+     updateProfile: async (displayName, bio, location) => {
+         try {
+             const {data} = await api.post(`${API}/updateProfile`, {displayName, bio, location})
+             set({user: data.user})
+             toast.success('Profile Updated!')
+             return true
+         } catch (e) {
+             console.log('UpdateBio error ', e)
+             toast.success('Error!')
+             return false
+         }
      }
+
+
 
 
 }))

@@ -1,10 +1,12 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Home, User, Settings, Feather, Search } from 'lucide-react';
 import {NavLink, useNavigate} from 'react-router-dom'
 import {useUserStore} from "../store/useUserStore.js";
 import {useModalStore} from "../store/useModalStore.js";
 import SearchList from "./SearchList.jsx";
 import PostForm from "./PostForm.jsx";
+import {useMatch} from 'react-router-dom'
+
 
 
 
@@ -13,6 +15,10 @@ const SideBar = () => {
     const navigate = useNavigate()
     const Open = useModalStore((s) => s.Open)
 
+    const onHome = useMatch('/')
+    const profileMatch = useMatch('/profile/:id')
+    const onMyProfile = profileMatch?.params.id === user?._id
+
     const navItems = [
         { icon: Home,     label: 'Home',     link: '/' },
         { icon: User,     label: 'Profile',  link: `/profile/${user?._id}` },
@@ -20,7 +26,8 @@ const SideBar = () => {
     ];
 
     const openPostForm = () => {
-        navigate('/')
+        if (!onHome && !onMyProfile) navigate('/')
+
         Open(
             <div>
                 <div className="flex justify-center items-center text-4xl mb-10">

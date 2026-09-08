@@ -13,7 +13,7 @@ const UserSchema = new Schema({
     bio:      { type: String, maxlength: 160, default: '' },
     avatar:   { type: String, default: '' },
     banner:   { type: String, default: '' },
-    location: { type: String, maxlength: 30, default: '' },
+    location: { type: String, maxlength: 70, default: '' },
     website:  { type: String, default: '' },
     verified: { type: Boolean, default: false },
 

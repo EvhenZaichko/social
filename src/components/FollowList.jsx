@@ -27,7 +27,7 @@ const FollowList = ({followers}) => {
                             <div key={f._id} className="flex bg-black w-120 h-20 border-b hover:bg-night-850" >
                                 <div className="flex items-center h-full ml-5 space-x-3 w-full" onClick={() => redirectToProfile(f._id)}>
                                     <span className="w-10 h-10 rounded-full bg-white cursor-pointer"></span>
-                                    <span className="cursor-pointer">{f.username}</span>
+                                    <span className="cursor-pointer">{f.displayName}</span>
                                 </div>
                                 <div className=" flex items-center pr-10 ">
                                     {f._id === myId ? (

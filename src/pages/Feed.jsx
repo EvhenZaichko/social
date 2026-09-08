@@ -1,9 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
-import PostList from "./PostList.jsx";
-import PostForm from "./PostForm.jsx";
+import PostList from "../components/PostList.jsx";
+import PostForm from "../components/PostForm.jsx";
 import {usePostStore} from "../store/usePostStore.js";
 import Spinner from "../UI/Spinner.jsx";
-import FeedToggle from "./feedToggle.jsx";
+import FeedToggle from "../components/FeedToggle.jsx";
 import axios from "axios";
 
 

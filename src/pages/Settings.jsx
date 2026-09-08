@@ -2,13 +2,15 @@ import React from 'react';
 import {LogOut, AtSign, Mail, ChevronRight} from "lucide-react";
 import {useUserStore} from "../store/useUserStore.js";
 import {useModalStore} from "../store/useModalStore.js";
-import UserUpdate from "../components/userUpdate.jsx";
+import UsernameUpdate from "../components/UsernameUpdate.jsx";
 
 const Settings = () => {
     const logout = useUserStore((s) => s.logout)
     const Open = useModalStore((s) => s.Open)
     const username = useUserStore((s) => s.user?.username ?? '')
     const email = useUserStore((s) => s.user?.email ?? '')
+
+    console.log(useUserStore((s) => s.user.following))
 
     return (
         <div className="w-120 min-h-screen border-x border-night-700">
@@ -24,7 +26,7 @@ const Settings = () => {
                 </h2>
 
                 <button
-                    onClick={() => Open(<UserUpdate/>)}
+                    onClick={() => Open(<UsernameUpdate/>)}
                     className="flex w-full items-center gap-4 px-4 py-4 text-left transition-colors hover:bg-night-850"
                 >
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-night-800">

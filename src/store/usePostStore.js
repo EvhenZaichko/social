@@ -19,13 +19,38 @@ export const usePostStore = create((set, get) => ({
             const result = await api.post(`${API}/createPost`, {content})
             const post = result.data.post
             set({posts: [ post, ...get().posts ]})
+            return true
         } catch (e) {
             console.log('create post error', e)
+            return false
         }
 
     },
 
+    createReply: async (content, parentId) => {
+        try {
+            const { data } = await api.post(`${API}/createPost`, { content, parent: parentId })
+            const reply = data.post
 
+            set((s) => ({
+                 posts: s.posts.map(post =>
+                 post._id === parentId
+                     ? {...post, replies: [...(post.replies ?? []), reply._id]}
+                     : post
+                 ),
+
+                currentPost: s.currentPost && {
+                    ...s.currentPost,
+                    replies: [...(s.currentPost.replies ?? []), reply],
+                },
+            }))
+            toast.success('Replay created!')
+            return true
+        } catch (e) {
+            console.log('createReply error', e)
+            return false
+        }
+    },
 
 
   loadFeed: async (tab, signal) => {
@@ -97,11 +122,7 @@ export const usePostStore = create((set, get) => ({
     },
 
 
-
-
     resetProfileFeed: () => set({posts: [], profileNextCursor: null, isLoadingMoreProfile: false}),
-
-
 
 
     toggleLike: async (postId) => {
@@ -143,9 +164,6 @@ export const usePostStore = create((set, get) => ({
 
 
 
-
-
-
     getPostById: async (postId) => {
         try {
             const {data} = await api.get(`${API}/getPostById/${postId}`)
@@ -159,27 +177,16 @@ export const usePostStore = create((set, get) => ({
 
 
 
-
-
-    getProfile: async (id, signal) => {
-        try {
-            const {data} = await api.get(`${API}/getProfile/${id}`, {signal})
-            return data.profile
-        } catch (e) {
-            console.log('getProfile error', e)
-            throw e
-        }
-    },
-
-
-
-
-
-
     deletePost: async (postId) => {
         try {
             await api.delete(`${API}/deletePost/${postId}`)
-            set({posts: get().posts.filter(post => post._id !== postId)})
+            set((s) => ({
+                posts: s.posts.filter(post => post._id !== postId),
+                currentPost: s.currentPost && {
+                    ...s.currentPost,
+                    replies: (s.currentPost.replies ?? []).filter(reply => reply._id !== postId),
+                },
+            }))
             toast.success('Post Deleted!')
             return true
         } catch (e) {

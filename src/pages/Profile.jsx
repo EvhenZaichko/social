@@ -1,17 +1,20 @@
-import React, {use, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import ProfileCard from "../components/ProfileCard.jsx";
 import PostList from "../components/PostList.jsx";
 import {usePostStore} from "../store/usePostStore.js";
 import Spinner from "../UI/Spinner.jsx";
-import {data, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import axios from 'axios'
+import {useUserStore} from "../store/useUserStore.js";
 
 
 const TABS = ['Posts','Likes', 'Replies', 'Reposts']
 
 const EMPTY = {
     Posts : 'There are no posts here yet',
-    Likes : 'You do not have liked posts yet'
+    Likes : 'You do not have liked posts yet',
+    Replies: 'You do not have any replies yet',
+    Reposts: 'You do not have any reposts yet'
 }
 
 const Profile = () => {
@@ -21,9 +24,10 @@ const Profile = () => {
     const [loading, setLoading] = useState(true)
     const [tabLoading, setTabLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [feedError, setFeedError] = useState(null)
 
     const posts = usePostStore((s) => s.posts)
-    const getProfile = usePostStore((s) => s.getProfile)
+    const getProfile = useUserStore((s) => s.getProfile)
     const profileNextCursor = usePostStore((s) => s.profileNextCursor)
     const isLoadingMoreProfile = usePostStore((s) => s.isLoadingMoreProfile)
     const loadProfileFeed = usePostStore((s) => s.loadProfileFeed)
@@ -70,10 +74,11 @@ const Profile = () => {
 
         const loadPosts = async () => {
             setTabLoading(true)
+            setFeedError(null)
             try {
                 await loadProfileFeed(id, activeTab, controller.signal)
             } catch (e) {
-                if (active && !axios.isCancel(e)) setError('failed to load profile feed')
+                if (active && !axios.isCancel(e)) setFeedError('failed to load profile feed')
             } finally {
                 if (active) setTabLoading(false)
             }
@@ -137,13 +142,15 @@ const Profile = () => {
 
             {tabLoading ? (
                 <div className="flex justify-center mt-5"><Spinner/></div>
+            ) : feedError ? (
+                <div className="flex justify-center mt-5 text-gray-500">{feedError}</div>
             ) : posts.length ? (
-                    <>
-                        <PostList/>
-                        {isLoadingMoreProfile && (
-                            <div className="flex justify-center mt-5"><Spinner/></div>
-                        )}
-                    </>
+                <>
+                    <PostList/>
+                    {isLoadingMoreProfile && (
+                        <div className="flex justify-center mt-5"><Spinner/></div>
+                    )}
+                </>
 
             ) : (
                 <div className="flex justify-center items-center mt-5">

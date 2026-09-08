@@ -1,5 +1,5 @@
 import Modal from "./components/Modal.jsx";
-import Feed from "./components/Feed.jsx";
+import Feed from "./pages/Feed.jsx";
 import Settings from "./pages/Settings.jsx";
 import SideBar from "./components/SideBar.jsx";
 import {Routes, Route, Navigate} from 'react-router-dom'

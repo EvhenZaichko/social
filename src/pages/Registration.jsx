@@ -8,10 +8,11 @@ const Registration = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
+    const [displayName, setDisplayName] = useState('')
 
     const handleSubmit = async (e) => {
-        e.preventDefault();                                       // без перезагрузки страницы
-        const result = await registration(email, password, username); // передаём данные!
+        e.preventDefault();
+        const result = await registration(email, password, username, displayName);
         if (result) navigate('/login');
     };
 
@@ -44,6 +45,15 @@ const Registration = () => {
                     />
                     <input
                         type="text"
+                        name="displayName"
+                        autoComplete="displayName"
+                        placeholder="displayname"
+                        value={displayName}
+                        onChange={e => setDisplayName(e.target.value)}
+                        className="bg-gray-600 p-2 rounded-2xl indent-6"
+                    />
+                    <input
+                        type="text"
                         name="username"
                         autoComplete="username"
                         placeholder="Name"
@@ -55,14 +65,14 @@ const Registration = () => {
 
                 <button
                     type="submit"
-                    className="mt-15 bg-gray-600 px-7 py-2 rounded-2xl cursor-pointer hover:bg-gray-500"
+                    className="mt-6 bg-gray-600 px-7 py-2 rounded-2xl cursor-pointer hover:bg-gray-500"
                 >
                     Sign up
                 </button>
 
                 <span
                     onClick={() => navigate('/login')}
-                    className="mt-4 cursor-pointer hover:text-gray-500"
+                    className="mt-6 cursor-pointer hover:text-gray-500"
                 >
                     Already have an account ?
                 </span>

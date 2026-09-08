@@ -71,7 +71,7 @@ const SearchList = () => {
                 {results.length > 0 ? (
                     results.map(user => (
                         <div key={user._id}
-                             className="flex items-center bg-black w-full h-20 gap-3 border-b hover:bg-night-850 pl-5 pr-5">
+                             className="flex items-center bg-black w-full h-20 gap-3  border-b border-night-500  hover:bg-night-850 pl-5 pr-5">
                             <span className="w-10 h-10 rounded-full bg-white shrink-0"></span>
                             <span className="min-w-0 truncate cursor-pointer" onClick={() => redirectToProfile(user._id)}>{user.username}</span>
                             <button

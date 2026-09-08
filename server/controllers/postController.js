@@ -33,7 +33,7 @@ class PostController  {
 
             const populated = /** @type {import('../models/PostModel.js').IPost} */ (
                 await PostModel.findById(post._id)
-                .populate('author', 'username email')
+                .populate('author', 'username displayName email')
                 .lean()
             )
 
@@ -74,14 +74,14 @@ class PostController  {
                 const me = await UserModel.findById(userId).select('following').lean()
                 if (!me) return res.status(404).json({ message: 'user not found' })
 
-                filter = { ...filter, author: { $in: [...me.following] } }
+                filter = { ...filter, author: { $in: [me.following] } }
             }
 
             if (cursor) filter = { ...filter, _id: { $lt: cursor } }
 
             const posts = /** @type {import('../models/PostModel.js').IPost[]} */ (
                 await PostModel.find(filter)
-                    .populate('author', 'username email')
+                    .populate('author', 'username displayName email')
                     .sort({ _id: -1 })
                     .limit(limit + 1)
                     .lean()
@@ -143,8 +143,9 @@ class PostController  {
         try {
             const post = /** @type {import('../models/PostModel.js').IPost} */ (
                 await PostModel.findById(postId)
-                .populate('author', 'username email')
-                .populate({ path: 'replies', populate: { path: 'author', select: 'username email' } })
+                    .populate('author', 'username displayName email')
+                    .populate({ path: 'replies', populate: { path: 'author', select: 'username displayName email' } })
+                    .populate({ path: 'parent', populate: { path: 'author', select: 'username displayName email' } })
                 .lean()
             )
 
@@ -159,6 +160,7 @@ class PostController  {
 
             const result = {
                 ...shape(post),
+                parent: post.parent ? shape(post.parent) : null,
                 replies: (post.replies ?? []).map(shape),
             }
 
@@ -168,40 +170,6 @@ class PostController  {
         }
     }
 
-
-    async getProfile(req, res) {
-        const meId = req.user.id
-        const profileId = req.params.id
-        try {
-            const [profile, postsCount] = await Promise.all([
-                /** @type {Promise<import('../models/UserModel.js').IUser>} */ (
-                    UserModel.findById(profileId)
-                        .select('username email avatar bio followers following')
-                        .lean()
-                ),
-                PostModel.countDocuments({ author: profileId, parent: null }),
-            ])
-
-            if (!profile) return res.status(404).json({ message: 'user not found' })
-
-
-            return res.json({
-                profile: {
-                    _id: profile._id,
-                    username: profile.username,
-                    email: profile.email,
-                    postsCount,
-                    followersCount: profile.followers.length,
-                    followingCount: profile.following.length,
-                    isFollowedByMe: profile.followers.some(id => id.equals(meId)),
-                    isMe: profile._id.equals(meId),
-                },
-            })
-        } catch (e) {
-            console.log('getProfile error', e)
-            return res.status(500).json({ message: 'getProfile error' })
-        }
-    }
 
 
     async getProfileFeed(req, res) {
@@ -213,7 +181,8 @@ class PostController  {
 
         const filters = {
             posts: {author: userId, parent: null},
-            likes: {likes: userId }
+            likes: {likes: userId },
+            replies: {author: userId, parent: {$ne: null}},
         }
 
         if (!filters[tab]) return res.status(400).json({message: 'unknown tab'})
@@ -228,7 +197,7 @@ class PostController  {
         try {
             const posts = /** @type {import('../models/PostModel.js').IPost[]} */ (
                 await PostModel.find(filter)
-                    .populate('author', 'username email')
+                    .populate('author', 'username displayName email')
                     .sort({_id: -1})
                     .limit(limit + 1)
                     .lean()
@@ -269,7 +238,7 @@ class PostController  {
                 await PostModel.deleteMany({ _id: { $in: post.replies } })
             }
 
-            await post.delete
+            await post.deleteOne()
 
             return res.json({
                 message: 'Post deleted',
