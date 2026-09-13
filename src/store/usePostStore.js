@@ -88,7 +88,6 @@ export const usePostStore = create((set, get) => ({
     resetFeed: () => set({posts: [], nextCursor: null, isLoadingMore: false}),
 
 
-
     loadProfileFeed: async (userId, tab, signal) => {
         const {data} = await api.get(`${API}/getProfileFeed/${userId}`, {
             params: {tab: tab.toLocaleLowerCase(), limit: 10},

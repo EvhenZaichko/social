@@ -56,7 +56,6 @@ class PostController  {
     }
 
 
-
     async getPosts(req, res) {
         const userId = req.user.id
         const tab = req.query.tab ?? 'all'
@@ -74,7 +73,7 @@ class PostController  {
                 const me = await UserModel.findById(userId).select('following').lean()
                 if (!me) return res.status(404).json({ message: 'user not found' })
 
-                filter = { ...filter, author: { $in: [me.following] } }
+                filter = { ...filter, author: { $in: me.following } }
             }
 
             if (cursor) filter = { ...filter, _id: { $lt: cursor } }

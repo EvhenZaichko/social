@@ -105,6 +105,7 @@ const Post = ({author, likes, reposts, content, replies, postId, likedByMe, date
                                                 Delete
                                             </li>
                                         )}
+                                        <li>Bookmark</li>
                                     </ul>
                                 </div>
                             )}

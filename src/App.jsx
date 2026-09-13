@@ -11,6 +11,7 @@ import {useUserStore} from "./store/useUserStore.js";
 import PostPage from "./pages/PostPage.jsx";
 import Spinner from "./UI/Spinner.jsx";
 import {Toaster} from 'react-hot-toast'
+import Notifications from "./pages/Notifications.jsx";
 
 
 function App() {
@@ -64,6 +65,7 @@ function App() {
                             <Route path="profile/:id" element={<Profile/>}/>
                             <Route path="settings" element={<Settings/>}/>
                             <Route path="/post/:id" element={<PostPage/>} />
+                            <Route path="/notification" element={<Notifications/>} />
                         </Routes>
                     </div>
                 </main>
