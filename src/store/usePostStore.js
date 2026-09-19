@@ -84,9 +84,7 @@ export const usePostStore = create((set, get) => ({
         }
     },
 
-
     resetFeed: () => set({posts: [], nextCursor: null, isLoadingMore: false}),
-
 
     loadProfileFeed: async (userId, tab, signal) => {
         const {data} = await api.get(`${API}/getProfileFeed/${userId}`, {
@@ -95,9 +93,6 @@ export const usePostStore = create((set, get) => ({
         })
         set({posts: data.posts, profileNextCursor: data.nextCursor})
     },
-
-
-
 
     loadMoreProfileFeed: async (userId, tab, signal) => {
         const {profileNextCursor, isLoadingMoreProfile} = get()
@@ -122,7 +117,6 @@ export const usePostStore = create((set, get) => ({
 
 
     resetProfileFeed: () => set({posts: [], profileNextCursor: null, isLoadingMoreProfile: false}),
-
 
     toggleLike: async (postId) => {
         const prev = { posts: get().posts, currentPost: get().currentPost }

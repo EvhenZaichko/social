@@ -4,6 +4,7 @@ import 'dotenv/config';
 import { connectDB } from './db.js';
 import authRouter from './routes/authRouter.js';
 import postRouter from "./routes/postRouter.js";
+import notificationRouter from "./routes/notificationRouter.js";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use("/authRouter", authRouter);
 app.use("/postRouter", postRouter)
+app.use("/notificationRouter", notificationRouter )
 
 app.get('/', (req, res) => {
     res.json({ status: 'ok', db: 'connected' });

@@ -1,6 +1,7 @@
 import PostModel from "../models/PostModel.js";
 import UserModel from "../models/UserModel.js";
 import mongoose from "mongoose";
+import {notifyLike, unNotifyLike} from "../services/notify.js";
 
 class PostController  {
 
@@ -122,6 +123,11 @@ class PostController  {
                 ? {$pull : {likes: userId}}
                 : {$addToSet: {likes: userId}}
             )
+
+            const notification = { recipient: post.author, sender: userId, post: post._id}
+
+            if(isLiked) await unNotifyLike(notification)
+            else await notifyLike(notification)
 
             return res.json({
                 date: post.createdAt,
